@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mobile LTV &amp; ROAS Modeler</title>
+<meta name="description" content="Interactive, dependency-free LTV & ROAS modeler for mobile game UA. Fit a retention curve, project LTV/ROAS to D720, find payback day, reverse-solve the early ROAS you need to break even." />
+<style>
+  :root{
+    --bg:#1a1b26; --panel:#24283b; --panel2:#1f2335; --border:#2f344d;
+    --text:#c0caf5; --muted:#565f89; --blue:#7aa2f7; --green:#9ece6a;
+    --red:#f7768e; --yellow:#e0af68; --purple:#bb9af7; --cyan:#7dcfff;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--bg);color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    line-height:1.5;padding:24px;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+  h1{font-family:"Fira Code",ui-monospace,monospace;font-size:24px;margin:0 0 4px;color:#fff}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 20px}
+  .grid{display:grid;grid-template-columns:340px 1fr;gap:20px}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}}
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px}
+  .panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--cyan);margin:0 0 14px;font-weight:600}
+  label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
+  input,select{
+    width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text);
+    border-radius:8px;padding:8px 10px;font-size:14px;font-family:ui-monospace,monospace;
+  }
+  input:focus,select:focus{outline:none;border-color:var(--blue)}
+  .row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+  @media(max-width:680px){.cards{grid-template-columns:repeat(2,1fr)}.row{grid-template-columns:1fr 1fr}}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px}
+  .card .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .card .v{font-size:22px;font-weight:700;font-family:ui-monospace,monospace;margin-top:4px}
+  .card .v.green{color:var(--green)} .card .v.red{color:var(--red)} .card .v.blue{color:var(--blue)} .card .v.yellow{color:var(--yellow)}
+  canvas{width:100%;display:block}
+  .chartbox{margin-bottom:18px}
+  .chartbox h3{font-size:12px;color:var(--muted);margin:0 0 8px;font-weight:500}
+  table{width:100%;border-collapse:collapse;font-family:ui-monospace,monospace;font-size:13px}
+  th,td{text-align:right;padding:6px 8px;border-bottom:1px solid var(--border)}
+  th:first-child,td:first-child{text-align:left}
+  th{color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase}
+  .warn{background:rgba(224,175,104,.12);border:1px solid var(--yellow);color:var(--yellow);
+    border-radius:8px;padding:10px 12px;font-size:12.5px;margin-bottom:16px}
+  .hint{font-size:11px;color:var(--muted);margin-top:4px}
+  details{margin-top:18px;border:1px solid var(--border);border-radius:10px;background:var(--panel2)}
+  summary{cursor:pointer;padding:12px 16px;font-size:13px;color:var(--cyan);font-weight:600}
+  details .body{padding:0 16px 16px;font-size:13px;color:#a9b1d6}
+  details code{background:#1a1b26;padding:1px 5px;border-radius:4px;color:var(--purple);font-size:12px}
+  .res-line{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+  .res-line span:last-child{font-family:ui-monospace,monospace;font-weight:600}
+  .legend{font-size:11px;color:var(--muted);margin-top:6px}
+  .legend b{font-weight:600}
+  .foot{color:var(--muted);font-size:12px;margin-top:22px;text-align:center}
+  a{color:var(--blue)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📈 Mobile LTV &amp; ROAS Modeler</h1>
+  <p class="sub">Fit a retention curve from D1–D30, project LTV &amp; ROAS to D720, and reverse-solve the early ROAS you need to break even. Zero dependencies, nothing leaves your browser.</p>
+
+  <div class="grid">
+    <!-- LEFT: INPUTS -->
+    <div>
+      <div class="panel">
+        <h2>Retention (%)</h2>
+        <div class="row">
+          <div><label>D1</label><input id="d1" type="number" value="45" step="0.1"></div>
+          <div><label>D3</label><input id="d3" type="number" value="28" step="0.1"></div>
+          <div><label>D7</label><input id="d7" type="number" value="18" step="0.1"></div>
+        </div>
+        <div class="row2">
+          <div><label>D14</label><input id="d14" type="number" value="12" step="0.1"></div>
+          <div><label>D30</label><input id="d30" type="number" value="7" step="0.1"></div>
+        </div>
+
+        <h2 style="margin-top:18px">Monetization &amp; UA</h2>
+        <div class="row2">
+          <div><label>ARPDAU ($)</label><input id="arpdau" type="number" value="0.12" step="0.01"></div>
+          <div><label>eCPI ($, optional)</label><input id="ecpi" type="number" value="2.50" step="0.01"></div>
+        </div>
+
+        <h2 style="margin-top:18px">Model</h2>
+        <label>Retention curve fit</label>
+        <select id="model">
+          <option value="power" selected>Power-law (industry default)</option>
+          <option value="exp">Exponential</option>
+          <option value="blend">Blended (power × exp average)</option>
+        </select>
+        <div class="row2" style="margin-top:6px">
+          <div><label>ARPDAU growth /30d (%)</label><input id="mat" type="number" value="0" step="1"></div>
+          <div><label>Horizon (days)</label>
+            <select id="horizon">
+              <option>180</option><option selected>360</option><option>720</option>
+            </select>
+          </div>
+        </div>
+        <div class="hint">Growth models payer concentration: survivors' ARPDAU often rises over a cohort's life.</div>
+
+        <h2 style="margin-top:18px">Long-horizon anchor <span style="color:var(--muted);text-transform:none;letter-spacing:0">(optional)</span></h2>
+        <div class="row2">
+          <div><label>Observed at day</label><input id="anchorDay" type="number" placeholder="e.g. 90" step="1"></div>
+          <div><label>Retention (%)</label><input id="anchorRet" type="number" placeholder="e.g. 4" step="0.1"></div>
+        </div>
+        <div class="hint">Pin the tail with a real D60 / D90 / D180 retention point so the curve isn't extrapolating blind. Leave empty to fit on D1–D30 only.</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: RESULTS -->
+    <div>
+      <div id="warn" class="warn" style="display:none"></div>
+
+      <div class="cards">
+        <div class="card"><div class="k">D30 LTV</div><div id="ltv30" class="v blue">—</div></div>
+        <div class="card"><div class="k">D180 LTV</div><div id="ltv180" class="v">—</div></div>
+        <div class="card"><div class="k" id="ltvHk">D360 LTV</div><div id="ltvH" class="v">—</div></div>
+        <div class="card"><div class="k">Payback day</div><div id="payback" class="v yellow">—</div></div>
+      </div>
+
+      <div class="panel chartbox">
+        <h3>Retention curve — fitted (line) vs your inputs (dots)</h3>
+        <canvas id="retChart" height="240"></canvas>
+        <div class="legend"><b style="color:var(--blue)">━</b> fitted &nbsp; <b style="color:var(--purple)">●</b> D1–D30 anchors &nbsp; <b style="color:var(--cyan)">●</b> long-horizon anchor</div>
+      </div>
+
+      <div class="panel chartbox">
+        <h3>Cumulative LTV vs eCPI — break-even where the curve crosses the dashed line</h3>
+        <canvas id="ltvChart" height="240"></canvas>
+      </div>
+
+      <div class="panel chartbox">
+        <h3>LTV / ROAS table</h3>
+        <table>
+          <thead><tr><th>Day</th><th>Cum. active days</th><th>LTV</th><th>ROAS</th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- REVERSE SOLVER -->
+      <div class="panel chartbox">
+        <h2>↩︎ Reverse solver — what do I need to break even?</h2>
+        <div class="row2" style="margin-bottom:6px">
+          <div><label>Reach this ROAS…</label><input id="tgtRoas" type="number" value="100" step="5"></div>
+          <div><label>…by day</label>
+            <select id="tgtDay"><option>180</option><option selected>360</option><option>720</option></select>
+          </div>
+        </div>
+        <div id="reverse"></div>
+        <div class="hint">Required early ROAS comes purely from curve shape (LTV-unlock ratio) — independent of eCPI or ARPDAU level.</div>
+      </div>
+
+      <!-- CAMPAIGN ACTUALS -->
+      <div class="panel chartbox">
+        <h2>📡 Project from a live campaign</h2>
+        <div class="row2" style="margin-bottom:6px">
+          <div><label>Observed ROAS (%)</label><input id="obsRoas" type="number" value="35" step="1"></div>
+          <div><label>…at day</label><input id="obsDay" type="number" value="7" step="1"></div>
+        </div>
+        <div id="campaign"></div>
+        <div class="hint">Scales your observed early ROAS by the model's maturation multiple: ROAS(Y) = ROAS(X) × LTV(Y)/LTV(X).</div>
+      </div>
+    </div>
+  </div>
+
+  <details>
+    <summary>Model &amp; assumptions — read before trusting a D720 number</summary>
+    <div class="body">
+      <p><strong>Retention fit.</strong> Anchor points D1/D3/D7/D14/D30 (plus an optional long-horizon point) are fit by least-squares regression.
+      Power-law: <code>R(d) = A·d^b</code> (log-log regression). Exponential: <code>R(d) = A·e^(b·d)</code> (semi-log).
+      Blended averages the two predicted curves. Day 0 (install day) retention = 1.0.</p>
+      <p><strong>Active days.</strong> <code>ActiveDays(N) = 1 + Σ R(d)</code> for d = 1…N (sum of fitted daily retention, plus the install day).</p>
+      <p><strong>LTV.</strong> <code>LTV(N) = Σ ARPDAU(d)·R(d)</code>, where <code>ARPDAU(d) = ARPDAU₀·(1+g)^(d/30)</code> and g is the growth/30d input (0 = constant ARPDAU).</p>
+      <p><strong>ROAS.</strong> <code>ROAS(N) = LTV(N) / eCPI × 100%</code>. Payback day = first day LTV ≥ eCPI.</p>
+      <p><strong>Reverse solver.</strong> Required ROAS at day E to hit target T% by day H: <code>T × LTV(E)/LTV(H)</code>. Required ARPDAU: <code>ARPDAU₀ × (eCPI·T/100) / LTV(H)</code>. Max viable eCPI: <code>LTV(H)·100/T</code>.</p>
+      <p><strong>Campaign projection.</strong> Projected ROAS at day Y from an observed ROAS at day X: <code>ROAS_obs × LTV(Y)/LTV(X)</code> (assumes the modeled curve shape matches the live cohort).</p>
+      <p style="color:var(--yellow)"><strong>Caveat.</strong> Without a long-horizon anchor the fit is built on ≤30 days, so D360/D720 are pure extrapolation. Real long-tail retention usually flattens (power-law can under-count survivors) and ARPDAU drifts up — add a real D60/D90/D180 point, use the growth input, and treat far-horizon numbers as a band, not a point.</p>
+    </div>
+  </details>
+
+  <p class="foot">Single-file, no dependencies, no data leaves the browser. Built for game producers &amp; UA teams.</p>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){return document.getElementById(id);};
+  var ANCHORS = [1,3,7,14,30];
+  var clamp = function(x,a,b){return Math.max(a,Math.min(b,x));};
+
+  // ---- curve fits -------------------------------------------------------
+  function fitPower(days, rets){
+    // R = A*d^b ; regress ln R on ln d
+    var n=days.length, sx=0,sy=0,sxx=0,sxy=0;
+    for(var i=0;i<n;i++){var x=Math.log(days[i]), y=Math.log(rets[i]); sx+=x;sy+=y;sxx+=x*x;sxy+=x*y;}
+    var b=(n*sxy-sx*sy)/(n*sxx-sx*sx), lnA=(sy-b*sx)/n, A=Math.exp(lnA);
+    return function(d){return clamp(A*Math.pow(d,b),0,1);};
+  }
+  function fitExp(days, rets){
+    // R = A*e^(b*d) ; regress ln R on d
+    var n=days.length, sx=0,sy=0,sxx=0,sxy=0;
+    for(var i=0;i<n;i++){var x=days[i], y=Math.log(rets[i]); sx+=x;sy+=y;sxx+=x*x;sxy+=x*y;}
+    var b=(n*sxy-sx*sy)/(n*sxx-sx*sx), lnA=(sy-b*sx)/n, A=Math.exp(lnA);
+    return function(d){return clamp(A*Math.exp(b*d),0,1);};
+  }
+  function buildR(model, days, rets){
+    var p=fitPower(days,rets), e=fitExp(days,rets);
+    if(model==="power") return p;
+    if(model==="exp")   return e;
+    return function(d){return clamp((p(d)+e(d))/2,0,1);};
+  }
+
+  // ---- LTV / active days ------------------------------------------------
+  function ltvSeries(R, arpdau, g, maxN){
+    var ltv=[arpdau], active=[1], cum=arpdau, days=1;
+    for(var d=1; d<=maxN; d++){
+      var a = arpdau*Math.pow(1+g, d/30);
+      cum += R(d)*a; days += R(d);
+      ltv[d]=cum; active[d]=days;
+    }
+    return {ltv:ltv, active:active};
+  }
+
+  // ---- chart helper -----------------------------------------------------
+  function drawChart(cv, opts){
+    var dpr=window.devicePixelRatio||1;
+    var W=cv.clientWidth, H=cv.height;
+    cv.width=W*dpr; cv.height=H*dpr;
+    var ctx=cv.getContext("2d"); ctx.scale(dpr,dpr);
+    ctx.clearRect(0,0,W,H);
+    var pad={l:48,r:14,t:10,b:24};
+    var pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
+    var xmax=opts.xmax, ymax=opts.ymax;
+    var X=function(x){return pad.l + x/xmax*pw;};
+    var Y=function(y){return pad.t + ph - y/ymax*ph;};
+    ctx.strokeStyle="#2f344d"; ctx.fillStyle="#565f89"; ctx.font="10px ui-monospace,monospace"; ctx.lineWidth=1;
+    for(var i=0;i<=4;i++){
+      var yy=pad.t+ph*i/4, val=ymax*(1-i/4);
+      ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(W-pad.r,yy);ctx.stroke();
+      ctx.textAlign="right";ctx.fillText(opts.yfmt?opts.yfmt(val):val.toFixed(0), pad.l-6, yy+3);
+    }
+    ctx.textAlign="center";
+    (opts.xticks||[]).forEach(function(t){ ctx.fillText(t.label, X(t.x), H-8); });
+    if(opts.ref!=null && opts.ref<=ymax){
+      ctx.strokeStyle="#e0af68"; ctx.setLineDash([5,4]); ctx.beginPath();
+      ctx.moveTo(pad.l,Y(opts.ref));ctx.lineTo(W-pad.r,Y(opts.ref));ctx.stroke();ctx.setLineDash([]);
+    }
+    if(opts.marker!=null && opts.marker<=xmax){
+      ctx.strokeStyle="#9ece6a";ctx.setLineDash([3,3]);ctx.beginPath();
+      ctx.moveTo(X(opts.marker),pad.t);ctx.lineTo(X(opts.marker),pad.t+ph);ctx.stroke();ctx.setLineDash([]);
+    }
+    (opts.series||[]).forEach(function(s){
+      if(s.type==="scatter"){
+        ctx.fillStyle=s.color;
+        s.pts.forEach(function(p){ if(p.x<=xmax){ctx.beginPath();ctx.arc(X(p.x),Y(p.y),3.8,0,7);ctx.fill();} });
+      }else{
+        ctx.strokeStyle=s.color;ctx.lineWidth=2;ctx.beginPath();
+        s.pts.forEach(function(p,i){ var px=X(p.x),py=Y(p.y); i?ctx.lineTo(px,py):ctx.moveTo(px,py);});
+        ctx.stroke();
+      }
+    });
+  }
+
+  var fmtMoney=function(v){return "$"+v.toFixed(v<10?3:2);};
+
+  // ---- main compute -----------------------------------------------------
+  function compute(){
+    var rets=[ +$("d1").value,+$("d3").value,+$("d7").value,+$("d14").value,+$("d30").value ].map(function(v){return v/100;});
+    var arpdau=+$("arpdau").value, ecpi=+$("ecpi").value, g=(+$("mat").value)/100;
+    var model=$("model").value, H=+$("horizon").value;
+
+    // optional long-horizon anchor
+    var fitDays=ANCHORS.slice(), fitRets=rets.slice();
+    var aDay=parseFloat($("anchorDay").value), aRet=parseFloat($("anchorRet").value)/100;
+    var anchored=false, anchorPt=null;
+    if(aDay>30 && aRet>0 && aRet<1){ fitDays.push(aDay); fitRets.push(aRet); anchored=true; anchorPt={x:aDay,y:aRet*100}; }
+
+    // validation
+    var warn=$("warn"), msgs=[];
+    for(var i=0;i<rets.length;i++){ if(!(rets[i]>0&&rets[i]<=1)){msgs.push("Retention values must be between 0 and 100%.");break;} }
+    for(var j=1;j<rets.length;j++){ if(rets[j]>rets[j-1]+1e-9){msgs.push("Retention should not increase over time (D"+ANCHORS[j]+" > D"+ANCHORS[j-1]+").");break;} }
+    if(anchored && aRet>rets[4]) msgs.push("Long-horizon anchor (D"+aDay+") is higher than your D30 — it should be lower.");
+    var anchorMax = anchored ? aDay : 30;
+    if(H>anchorMax){
+      msgs.push(anchored
+        ? ("Projecting past your D"+aDay+" anchor still extrapolates the tail — treat D"+H+" as a band.")
+        : ("Projecting to D"+H+" extrapolates a ≤30-day fit — add a long-horizon anchor to pin the tail."));
+    }
+    if(msgs.length){warn.style.display="block";warn.innerHTML=msgs.map(function(m){return "⚠️ "+m;}).join("<br>");}
+    else warn.style.display="none";
+
+    var R=buildR(model, fitDays, fitRets);
+    var maxN=720;
+    var S=ltvSeries(R, arpdau, g, maxN);
+    var LTV=function(n){return S.ltv[Math.round(clamp(n,0,maxN))];};
+
+    // cards
+    $("ltv30").textContent=fmtMoney(LTV(30));
+    $("ltv180").textContent=fmtMoney(LTV(180));
+    $("ltvHk").textContent="D"+H+" LTV";
+    $("ltvH").textContent=fmtMoney(LTV(H));
+    var pb=null; for(var d=0;d<=maxN;d++){ if(S.ltv[d]>=ecpi){pb=d;break;} }
+    $("payback").textContent = ecpi>0 ? (pb!=null?("D"+pb):(">D720")) : "—";
+    $("payback").className = "v "+(pb!=null && pb<=180?"green":(pb!=null?"yellow":"red"));
+
+    // retention chart
+    var retPts=[]; for(var x=1;x<=H;x+=Math.max(1,Math.floor(H/120))) retPts.push({x:x,y:R(x)*100});
+    var ser=[
+      {type:"line",color:"#7aa2f7",pts:retPts},
+      {type:"scatter",color:"#bb9af7",pts:ANCHORS.map(function(a,k){return {x:a,y:rets[k]*100};})}
+    ];
+    if(anchored) ser.push({type:"scatter",color:"#7dcfff",pts:[anchorPt]});
+    drawChart($("retChart"),{
+      xmax:H, ymax:Math.max(50, (+$("d1").value)*1.1), yfmt:function(v){return v.toFixed(0)+"%";},
+      xticks:[{x:1,label:"D1"},{x:H*0.25,label:"D"+Math.round(H*0.25)},{x:H*0.5,label:"D"+Math.round(H*0.5)},{x:H*0.75,label:"D"+Math.round(H*0.75)},{x:H,label:"D"+H}],
+      series:ser
+    });
+
+    // ltv chart
+    var ltvPts=[]; for(var x2=0;x2<=H;x2+=Math.max(1,Math.floor(H/120))) ltvPts.push({x:x2,y:LTV(x2)});
+    var ymaxL=Math.max(LTV(H), ecpi)*1.1;
+    drawChart($("ltvChart"),{
+      xmax:H, ymax:ymaxL, yfmt:function(v){return "$"+v.toFixed(2);}, ref: ecpi>0?ecpi:null, marker: pb,
+      xticks:[{x:0,label:"D0"},{x:H*0.25,label:"D"+Math.round(H*0.25)},{x:H*0.5,label:"D"+Math.round(H*0.5)},{x:H*0.75,label:"D"+Math.round(H*0.75)},{x:H,label:"D"+H}],
+      series:[{type:"line",color:"#9ece6a",pts:ltvPts}]
+    });
+
+    // table
+    var rows=[7,14,30,60,90,180,360,720];
+    $("tbody").innerHTML=rows.map(function(n){
+      var roas= ecpi>0? (LTV(n)/ecpi*100):null;
+      var rc = roas==null?"":(roas>=100?"color:#9ece6a":"color:#f7768e");
+      return "<tr><td>D"+n+"</td><td>"+S.active[n].toFixed(1)+"</td><td>"+fmtMoney(LTV(n))+"</td><td style='"+rc+"'>"+(roas==null?"—":roas.toFixed(0)+"%")+"</td></tr>";
+    }).join("");
+
+    // reverse solver
+    var T=+$("tgtRoas").value, Hd=+$("tgtDay").value;
+    var reqE=function(E){return T*LTV(E)/LTV(Hd);};
+    var reqArp = arpdau*(ecpi*T/100)/LTV(Hd);
+    var maxEcpi = LTV(Hd)*100/T;
+    $("reverse").innerHTML=
+      line("Required D7 ROAS to hit "+T+"% by D"+Hd, reqE(7).toFixed(1)+"%")+
+      line("Required D14 ROAS to hit "+T+"% by D"+Hd, reqE(14).toFixed(1)+"%")+
+      line("Required D30 ROAS to hit "+T+"% by D"+Hd, reqE(30).toFixed(1)+"%")+
+      line("Required ARPDAU (at current eCPI)", fmtMoney(reqArp)+(reqArp<=arpdau?" ✅":" ▲"))+
+      line("Max viable eCPI (at current ARPDAU)", fmtMoney(maxEcpi)+(ecpi<=maxEcpi?" ✅":" ▲"));
+
+    // campaign projection
+    var oR=+$("obsRoas").value, oD=clamp(+$("obsDay").value,1,maxN);
+    var proj=function(Y){return oR*LTV(Y)/LTV(oD);};
+    var beDay=null; for(var y=oD;y<=maxN;y++){ if(oR*LTV(y)/LTV(oD)>=100){beDay=y;break;} }
+    $("campaign").innerHTML=
+      line("Projected D180 ROAS", proj(180).toFixed(0)+"%")+
+      line("Projected D360 ROAS", proj(360).toFixed(0)+"%")+
+      line("Projected D720 ROAS", proj(720).toFixed(0)+"%")+
+      line("Implied break-even day", beDay!=null?("D"+beDay):">D720");
+  }
+  function line(k,v){return "<div class='res-line'><span style='color:var(--muted)'>"+k+"</span><span>"+v+"</span></div>";}
+
+  ["d1","d3","d7","d14","d30","arpdau","ecpi","model","mat","horizon","anchorDay","anchorRet","tgtRoas","tgtDay","obsRoas","obsDay"]
+    .forEach(function(id){ $(id).addEventListener("input",compute); $(id).addEventListener("change",compute); });
+  window.addEventListener("resize",compute);
+  compute();
+})();
+</script>
+</body>
+</html>

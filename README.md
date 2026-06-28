@@ -1,12 +1,14 @@
 # 📈 Mobile LTV & ROAS Modeler
 
+[![▶ Live Demo](https://img.shields.io/badge/▶_Live_Demo-stonedhawk.github.io-7aa2f7?style=for-the-badge)](https://stonedhawk.github.io/mobile-ltv-roas-modeler/)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![No dependencies](https://img.shields.io/badge/dependencies-zero-brightgreen.svg)](#)
 [![Single file](https://img.shields.io/badge/build-none%20·%20single%20file-blue.svg)](#)
 
 **A dependency-free, single-file LTV & ROAS modeler for mobile game UA.** Fit a retention curve from your D1–D30 numbers, project LTV & ROAS out to D720, find your payback day, and reverse-solve the early ROAS you need to break even. Everything runs in the browser — no SDK, no backend, no data leaves the page.
 
-**▶ Live demo:** https://stonedhawk.github.io/mobile-ltv-roas-modeler/
+### ▶ Try it live: **[stonedhawk.github.io/mobile-ltv-roas-modeler](https://stonedhawk.github.io/mobile-ltv-roas-modeler/)**
 
 ---
 
@@ -46,7 +48,7 @@ To keep the model honest: add a real **D60 / D90 / D180 retention point** in the
 
 ## 🚀 Run it
 
-It's one file. Open `index.html` in any browser, or deploy to GitHub Pages (Settings → Pages → deploy from `main` / root). No build step, no install.
+Use the **[hosted version](https://stonedhawk.github.io/mobile-ltv-roas-modeler/)**, or run it locally — it's one file with no build step:
 
 ```bash
 git clone https://github.com/stonedhawk/mobile-ltv-roas-modeler.git

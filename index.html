@@ -58,6 +58,10 @@
   .legend b{font-weight:600}
   .foot{color:var(--muted);font-size:12px;margin-top:22px;text-align:center}
   a{color:var(--blue)}
+  .presets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .preset{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 4px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .12s}
+  .preset:hover{border-color:var(--blue);color:#fff}
+  .preset.active{background:rgba(122,162,247,.18);border-color:var(--blue);color:#fff}
 </style>
 </head>
 <body>
@@ -69,7 +73,14 @@
     <!-- LEFT: INPUTS -->
     <div>
       <div class="panel">
-        <h2>Retention (%)</h2>
+        <h2 style="margin-top:0">Quick start <span style="color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400">— load a profile</span></h2>
+        <div class="presets">
+          <button type="button" class="preset" data-preset="hypercasual">Hypercasual</button>
+          <button type="button" class="preset active" data-preset="casual">Casual</button>
+          <button type="button" class="preset" data-preset="midcore">Midcore</button>
+        </div>
+
+        <h2 style="margin-top:18px">Retention (%)</h2>
         <div class="row">
           <div><label>D1</label><input id="d1" type="number" value="45" step="0.1"></div>
           <div><label>D3</label><input id="d3" type="number" value="28" step="0.1"></div>
@@ -77,13 +88,13 @@
         </div>
         <div class="row2">
           <div><label>D14</label><input id="d14" type="number" value="12" step="0.1"></div>
-          <div><label>D30</label><input id="d30" type="number" value="7" step="0.1"></div>
+          <div><label>D30</label><input id="d30" type="number" value="8" step="0.1"></div>
         </div>
 
         <h2 style="margin-top:18px">Monetization &amp; UA</h2>
         <div class="row2">
-          <div><label>ARPDAU ($)</label><input id="arpdau" type="number" value="0.12" step="0.01"></div>
-          <div><label>eCPI ($, optional)</label><input id="ecpi" type="number" value="2.50" step="0.01"></div>
+          <div><label>ARPDAU ($)</label><input id="arpdau" type="number" value="0.14" step="0.01"></div>
+          <div><label>eCPI ($, optional)</label><input id="ecpi" type="number" value="2.00" step="0.01"></div>
         </div>
 
         <h2 style="margin-top:18px">Model</h2>
@@ -364,6 +375,29 @@
 
   ["d1","d3","d7","d14","d30","arpdau","ecpi","model","mat","horizon","anchorDay","anchorRet","tgtRoas","tgtDay","obsRoas","obsDay"]
     .forEach(function(id){ $(id).addEventListener("input",compute); $(id).addEventListener("change",compute); });
+
+  // ---- quick-start presets ---------------------------------------------
+  var PRESETS={
+    hypercasual:{d1:38,d3:18,d7:10,d14:5,d30:2.5,arpdau:0.06,ecpi:0.30,mat:0,model:"power"},
+    casual:     {d1:45,d3:28,d7:18,d14:12,d30:8, arpdau:0.14,ecpi:2.00,mat:0,model:"power"},
+    midcore:    {d1:50,d3:35,d7:26,d14:20,d30:14,arpdau:0.40,ecpi:7.50,mat:5,model:"power"}
+  };
+  var presetBtns=document.querySelectorAll(".preset");
+  function clearActive(){ Array.prototype.forEach.call(presetBtns,function(b){b.classList.remove("active");}); }
+  Array.prototype.forEach.call(presetBtns,function(btn){
+    btn.addEventListener("click",function(){
+      var p=PRESETS[btn.getAttribute("data-preset")]; if(!p) return;
+      for(var k in p){ if($(k)) $(k).value=p[k]; }
+      $("anchorDay").value=""; $("anchorRet").value="";
+      clearActive(); btn.classList.add("active");
+      compute();
+    });
+  });
+  // a manual edit means it's no longer a clean preset — drop the highlight
+  ["d1","d3","d7","d14","d30","arpdau","ecpi","model","mat"].forEach(function(id){
+    $(id).addEventListener("input",clearActive);
+  });
+
   window.addEventListener("resize",compute);
   compute();
 })();

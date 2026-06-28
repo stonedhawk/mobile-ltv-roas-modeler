@@ -10,6 +10,8 @@
 
 ### ▶ Try it live: **[stonedhawk.github.io/mobile-ltv-roas-modeler](https://stonedhawk.github.io/mobile-ltv-roas-modeler/)**
 
+![Mobile LTV & ROAS Modeler — overview](assets/overview.png)
+
 ---
 
 ## 🎯 What it answers
@@ -19,6 +21,20 @@
 - **What D7 / D14 ROAS do I need** to hit 100% ROAS by D180 / D360 / D720? *(the reverse solver)*
 - **What will a live campaign mature to** — project a campaign's D360 ROAS from its observed D7 ROAS.
 - **What's the max eCPI I can afford**, or the ARPDAU I'd need, to make the target work?
+
+![LTV / ROAS table, reverse solver, and live-campaign projection](assets/analysis.png)
+
+---
+
+## 🚦 Quick-start profiles
+
+One click loads a realistic starting point so you're not staring at a blank form:
+
+| Profile | Retention shape | ARPDAU | eCPI | Payback |
+|---------|-----------------|--------|------|---------|
+| **Hypercasual** | D1 38% → D30 2.5% | $0.06 | $0.30 | ~D177 |
+| **Casual** | D1 45% → D30 8% | $0.14 | $2.00 | ~D242 |
+| **Midcore** | D1 50% → D30 14% | $0.40 | $7.50 | ~D122 |
 
 ---
 

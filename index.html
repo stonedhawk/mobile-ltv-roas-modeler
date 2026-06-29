@@ -5,82 +5,128 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Mobile LTV &amp; ROAS Modeler</title>
 <meta name="description" content="Interactive, dependency-free LTV & ROAS modeler for mobile game UA. Fit a retention curve, project LTV/ROAS to D720, find payback day, reverse-solve the early ROAS you need to break even." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#1a1b26; --panel:#24283b; --panel2:#1f2335; --border:#2f344d;
-    --text:#c0caf5; --muted:#565f89; --blue:#7aa2f7; --green:#9ece6a;
-    --red:#f7768e; --yellow:#e0af68; --purple:#bb9af7; --cyan:#7dcfff;
+    --bg:#0c0d13; --panel-a:#191c2b; --panel-b:#14161f; --panel2:#0f1119;
+    --border:rgba(255,255,255,.07); --border-str:rgba(255,255,255,.13);
+    --text:#e7eaf6; --muted:#8b93b8; --faint:#5a6184;
+    --blue:#7aa2f7; --green:#9ece6a; --red:#f7768e; --yellow:#e0af68; --purple:#bb9af7; --cyan:#7dcfff;
+    --shadow:0 12px 32px -12px rgba(0,0,0,.6);
+    --mono:'Fira Code',ui-monospace,SFMono-Regular,monospace;
+    --sans:'Fira Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   }
   *{box-sizing:border-box}
-  body{
-    margin:0;background:var(--bg);color:var(--text);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    line-height:1.5;padding:24px;
-  }
-  .wrap{max-width:1180px;margin:0 auto}
-  h1{font-family:"Fira Code",ui-monospace,monospace;font-size:24px;margin:0 0 4px;color:#fff}
-  .sub{color:var(--muted);font-size:14px;margin:0 0 20px}
-  .grid{display:grid;grid-template-columns:340px 1fr;gap:20px}
-  @media(max-width:860px){.grid{grid-template-columns:1fr}}
-  .panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px}
-  .panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--cyan);margin:0 0 14px;font-weight:600}
-  label{display:block;font-size:12px;color:var(--muted);margin:10px 0 4px}
-  input,select{
-    width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text);
-    border-radius:8px;padding:8px 10px;font-size:14px;font-family:ui-monospace,monospace;
-  }
-  input:focus,select:focus{outline:none;border-color:var(--blue)}
+  html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  body{margin:0;color:var(--text);font-family:var(--sans);line-height:1.55;padding:30px 24px 40px;
+    background:
+      radial-gradient(1100px 520px at 78% -8%, rgba(122,162,247,.10), transparent 60%),
+      radial-gradient(900px 480px at 8% 4%, rgba(187,154,247,.07), transparent 55%),
+      var(--bg);
+    background-attachment:fixed;}
+  .wrap{max-width:1200px;margin:0 auto}
+  ::selection{background:rgba(122,162,247,.3)}
+
+  .head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:22px;flex-wrap:wrap}
+  h1{font-size:26px;margin:0;letter-spacing:-.02em;font-weight:800;color:#fff;display:flex;align-items:center;gap:11px}
+  h1 .glyph{display:inline-grid;place-items:center;width:38px;height:38px;border-radius:11px;
+    background:linear-gradient(145deg,rgba(122,162,247,.22),rgba(125,207,255,.10));
+    border:1px solid var(--border-str);box-shadow:inset 0 1px 0 rgba(255,255,255,.10)}
+  .sub{color:var(--muted);font-size:13.5px;margin:9px 0 0;max-width:680px;line-height:1.6}
+  .badge-link{font-size:11.5px;color:var(--muted);text-decoration:none;border:1px solid var(--border);
+    background:linear-gradient(180deg,var(--panel-a),var(--panel-b));border-radius:999px;padding:7px 13px;
+    display:inline-flex;align-items:center;gap:7px;white-space:nowrap;transition:.18s}
+  .badge-link:hover{border-color:var(--blue);color:var(--text)}
+  .badge-link .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+
+  .grid{display:grid;grid-template-columns:348px 1fr;gap:22px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  .panel{background:linear-gradient(168deg,var(--panel-a),var(--panel-b));border:1px solid var(--border);
+    border-radius:16px;padding:20px;box-shadow:var(--shadow);position:relative}
+  .panel::before{content:"";position:absolute;inset:0;border-radius:16px;pointer-events:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+  .panel h2{font-size:11px;text-transform:uppercase;letter-spacing:.13em;color:var(--cyan);margin:0 0 14px;font-weight:700}
+  label{display:block;font-size:11.5px;color:var(--muted);margin:12px 0 5px;font-weight:500}
+  input,select{width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text);
+    border-radius:9px;padding:9px 11px;font-size:14px;font-family:var(--mono);transition:.15s;font-feature-settings:"tnum"}
+  input:hover,select:hover{border-color:var(--border-str)}
+  input:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(122,162,247,.16)}
+  select{cursor:pointer}
   .row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:20px}
   @media(max-width:680px){.cards{grid-template-columns:repeat(2,1fr)}.row{grid-template-columns:1fr 1fr}}
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px}
-  .card .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-  .card .v{font-size:22px;font-weight:700;font-family:ui-monospace,monospace;margin-top:4px}
-  .card .v.green{color:var(--green)} .card .v.red{color:var(--red)} .card .v.blue{color:var(--blue)} .card .v.yellow{color:var(--yellow)}
+  .card{background:linear-gradient(168deg,var(--panel-a),var(--panel-b));border:1px solid var(--border);
+    border-radius:14px;padding:15px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:.2s}
+  .card::after{content:"";position:absolute;top:0;left:0;right:0;height:2px;opacity:.85;
+    background:linear-gradient(90deg,transparent,var(--accent,var(--blue)),transparent)}
+  .card:hover{transform:translateY(-2px);border-color:var(--border-str)}
+  .card .k{font-size:10.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+  .card .v{font-size:23px;font-weight:700;font-family:var(--mono);margin-top:5px;letter-spacing:-.01em;font-feature-settings:"tnum";color:var(--text)}
+  .card .v.green{color:var(--green);text-shadow:0 0 16px rgba(158,206,106,.30)}
+  .card .v.red{color:var(--red);text-shadow:0 0 16px rgba(247,118,142,.30)}
+  .card .v.blue{color:var(--blue);text-shadow:0 0 16px rgba(122,162,247,.30)}
+  .card .v.yellow{color:var(--yellow);text-shadow:0 0 16px rgba(224,175,104,.30)}
+  .card.blue{--accent:var(--blue)} .card.green{--accent:var(--green)} .card.yellow{--accent:var(--yellow)} .card.cyan{--accent:var(--cyan)}
   canvas{width:100%;display:block}
-  .chartbox{margin-bottom:18px}
-  .chartbox h3{font-size:12px;color:var(--muted);margin:0 0 8px;font-weight:500}
-  table{width:100%;border-collapse:collapse;font-family:ui-monospace,monospace;font-size:13px}
-  th,td{text-align:right;padding:6px 8px;border-bottom:1px solid var(--border)}
+  .chartbox{margin-bottom:20px}
+  .chartbox h2{margin-bottom:12px}
+  .chartbox h3{font-size:12px;color:var(--muted);margin:0 0 10px;font-weight:500}
+  table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:13px;font-feature-settings:"tnum"}
+  th,td{text-align:right;padding:7px 8px;border-bottom:1px solid var(--border)}
   th:first-child,td:first-child{text-align:left}
-  th{color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase}
-  .warn{background:rgba(224,175,104,.12);border:1px solid var(--yellow);color:var(--yellow);
-    border-radius:8px;padding:10px 12px;font-size:12.5px;margin-bottom:16px}
-  .hint{font-size:11px;color:var(--muted);margin-top:4px}
-  details{margin-top:18px;border:1px solid var(--border);border-radius:10px;background:var(--panel2)}
-  summary{cursor:pointer;padding:12px 16px;font-size:13px;color:var(--cyan);font-weight:600}
-  details .body{padding:0 16px 16px;font-size:13px;color:#a9b1d6}
-  details code{background:#1a1b26;padding:1px 5px;border-radius:4px;color:var(--purple);font-size:12px}
-  .res-line{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
-  .res-line span:last-child{font-family:ui-monospace,monospace;font-weight:600}
-  .legend{font-size:11px;color:var(--muted);margin-top:6px}
+  th{color:var(--faint);font-weight:500;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em}
+  .warn{display:flex;gap:10px;align-items:flex-start;
+    background:linear-gradient(120deg,rgba(224,175,104,.13),rgba(224,175,104,.03));border:1px solid rgba(224,175,104,.4);
+    color:var(--yellow);border-radius:12px;padding:12px 14px;font-size:12.5px;margin-bottom:16px;line-height:1.5}
+  .warn::before{content:"!";font-family:var(--mono);font-weight:700;flex:none;margin-top:1px}
+  .hint{font-size:11px;color:var(--faint);margin-top:6px;line-height:1.5}
+  details{margin-top:22px;border:1px solid var(--border);border-radius:14px;background:linear-gradient(168deg,var(--panel-a),var(--panel-b));box-shadow:var(--shadow)}
+  summary{cursor:pointer;padding:15px 18px;font-size:13px;color:var(--cyan);font-weight:600;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸ ";color:var(--faint)}
+  details[open] summary::before{content:"▾ "}
+  details .body{padding:2px 18px 18px;font-size:13px;color:#aab2d6;line-height:1.65}
+  details code{background:var(--bg);padding:1.5px 6px;border-radius:5px;color:var(--purple);font-size:12px;font-family:var(--mono)}
+  .res-line{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+  .res-line:last-child{border-bottom:none}
+  .res-line span:last-child{font-family:var(--mono);font-weight:600;font-feature-settings:"tnum"}
+  .legend{font-size:11px;color:var(--faint);margin-top:8px}
   .legend b{font-weight:600}
-  .foot{color:var(--muted);font-size:12px;margin-top:22px;text-align:center}
-  a{color:var(--blue)}
-  .presets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-  .preset{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 4px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .12s}
-  .preset:hover{border-color:var(--blue);color:#fff}
-  .preset.active{background:rgba(122,162,247,.18);border-color:var(--blue);color:#fff}
+  .foot{color:var(--faint);font-size:12px;margin-top:26px;text-align:center;line-height:1.7}
+  a{color:var(--blue);text-decoration:none} a:hover{text-decoration:underline}
+  .presets{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:4px;border-radius:11px;background:var(--panel2);border:1px solid var(--border)}
+  .preset{background:transparent;border:1px solid transparent;color:var(--muted);border-radius:8px;padding:9px 4px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:.16s}
+  .preset:hover{color:var(--text)}
+  .preset.active{background:linear-gradient(160deg,rgba(122,162,247,.22),rgba(122,162,247,.06));border-color:rgba(122,162,247,.4);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+  .preset:focus-visible,summary:focus-visible,.badge-link:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(125,207,255,.45)}
+  @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+  @media(max-width:560px){body{padding:20px 14px}h1{font-size:22px}.cards{gap:10px}.head{gap:10px}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>📈 Mobile LTV &amp; ROAS Modeler</h1>
-  <p class="sub">Fit a retention curve from D1–D30, project LTV &amp; ROAS to D720, and reverse-solve the early ROAS you need to break even. Zero dependencies, nothing leaves your browser.</p>
+  <div class="head">
+    <div>
+      <h1><span class="glyph"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#9ab4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 7-7"/><path d="M17 7h4v4"/></svg></span> Mobile LTV &amp; ROAS Modeler</h1>
+      <p class="sub">Fit a retention curve from D1-D30, project LTV &amp; ROAS to D720, and reverse-solve the early ROAS you need to break even. Zero dependencies, nothing leaves your browser.</p>
+    </div>
+    <a class="badge-link" href="https://stonedhawk.github.io/mobile-ua-incrementality-lab/" target="_blank"><span class="dot"></span> Part of the UA suite · Lift Lab</a>
+  </div>
 
   <div class="grid">
     <!-- LEFT: INPUTS -->
     <div>
       <div class="panel">
-        <h2 style="margin-top:0">Quick start <span style="color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400">— load a profile</span></h2>
+        <h2 style="margin-top:0">Quick start <span style="color:var(--faint);text-transform:none;letter-spacing:0;font-weight:400">— load a profile</span></h2>
         <div class="presets">
           <button type="button" class="preset" data-preset="hypercasual">Hypercasual</button>
           <button type="button" class="preset active" data-preset="casual">Casual</button>
           <button type="button" class="preset" data-preset="midcore">Midcore</button>
         </div>
 
-        <h2 style="margin-top:18px">Retention (%)</h2>
+        <h2 style="margin-top:20px">Retention (%)</h2>
         <div class="row">
           <div><label>D1</label><input id="d1" type="number" value="45" step="0.1"></div>
           <div><label>D3</label><input id="d3" type="number" value="28" step="0.1"></div>
@@ -91,13 +137,13 @@
           <div><label>D30</label><input id="d30" type="number" value="8" step="0.1"></div>
         </div>
 
-        <h2 style="margin-top:18px">Monetization &amp; UA</h2>
+        <h2 style="margin-top:20px">Monetization &amp; UA</h2>
         <div class="row2">
           <div><label>ARPDAU ($)</label><input id="arpdau" type="number" value="0.14" step="0.01"></div>
           <div><label>eCPI ($, optional)</label><input id="ecpi" type="number" value="2.00" step="0.01"></div>
         </div>
 
-        <h2 style="margin-top:18px">Model</h2>
+        <h2 style="margin-top:20px">Model</h2>
         <label>Retention curve fit</label>
         <select id="model">
           <option value="power" selected>Power-law (industry default)</option>
@@ -114,12 +160,12 @@
         </div>
         <div class="hint">Growth models payer concentration: survivors' ARPDAU often rises over a cohort's life.</div>
 
-        <h2 style="margin-top:18px">Long-horizon anchor <span style="color:var(--muted);text-transform:none;letter-spacing:0">(optional)</span></h2>
+        <h2 style="margin-top:20px">Long-horizon anchor <span style="color:var(--faint);text-transform:none;letter-spacing:0;font-weight:400">(optional)</span></h2>
         <div class="row2">
           <div><label>Observed at day</label><input id="anchorDay" type="number" placeholder="e.g. 90" step="1"></div>
           <div><label>Retention (%)</label><input id="anchorRet" type="number" placeholder="e.g. 4" step="0.1"></div>
         </div>
-        <div class="hint">Pin the tail with a real D60 / D90 / D180 retention point so the curve isn't extrapolating blind. Leave empty to fit on D1–D30 only.</div>
+        <div class="hint">Pin the tail with a real D60 / D90 / D180 retention point so the curve isn't extrapolating blind. Leave empty to fit on D1-D30 only.</div>
       </div>
     </div>
 
@@ -128,10 +174,10 @@
       <div id="warn" class="warn" style="display:none"></div>
 
       <div class="cards">
-        <div class="card"><div class="k">D30 LTV</div><div id="ltv30" class="v blue">—</div></div>
+        <div class="card blue"><div class="k">D30 LTV</div><div id="ltv30" class="v blue">—</div></div>
         <div class="card"><div class="k">D180 LTV</div><div id="ltv180" class="v">—</div></div>
         <div class="card"><div class="k" id="ltvHk">D360 LTV</div><div id="ltvH" class="v">—</div></div>
-        <div class="card"><div class="k">Payback day</div><div id="payback" class="v yellow">—</div></div>
+        <div class="card yellow"><div class="k">Payback day</div><div id="payback" class="v yellow">—</div></div>
       </div>
 
       <div class="panel chartbox">
@@ -155,7 +201,7 @@
 
       <!-- REVERSE SOLVER -->
       <div class="panel chartbox">
-        <h2>↩︎ Reverse solver — what do I need to break even?</h2>
+        <h2>Reverse solver — what do I need to break even?</h2>
         <div class="row2" style="margin-bottom:6px">
           <div><label>Reach this ROAS…</label><input id="tgtRoas" type="number" value="100" step="5"></div>
           <div><label>…by day</label>
@@ -163,12 +209,12 @@
           </div>
         </div>
         <div id="reverse"></div>
-        <div class="hint">Required early ROAS comes purely from curve shape (LTV-unlock ratio) — independent of eCPI or ARPDAU level.</div>
+        <div class="hint">Required early ROAS comes purely from curve shape (LTV-unlock ratio), independent of eCPI or ARPDAU level.</div>
       </div>
 
       <!-- CAMPAIGN ACTUALS -->
       <div class="panel chartbox">
-        <h2>📡 Project from a live campaign</h2>
+        <h2>Project from a live campaign</h2>
         <div class="row2" style="margin-bottom:6px">
           <div><label>Observed ROAS (%)</label><input id="obsRoas" type="number" value="35" step="1"></div>
           <div><label>…at day</label><input id="obsDay" type="number" value="7" step="1"></div>
@@ -190,7 +236,7 @@
       <p><strong>ROAS.</strong> <code>ROAS(N) = LTV(N) / eCPI × 100%</code>. Payback day = first day LTV ≥ eCPI.</p>
       <p><strong>Reverse solver.</strong> Required ROAS at day E to hit target T% by day H: <code>T × LTV(E)/LTV(H)</code>. Required ARPDAU: <code>ARPDAU₀ × (eCPI·T/100) / LTV(H)</code>. Max viable eCPI: <code>LTV(H)·100/T</code>.</p>
       <p><strong>Campaign projection.</strong> Projected ROAS at day Y from an observed ROAS at day X: <code>ROAS_obs × LTV(Y)/LTV(X)</code> (assumes the modeled curve shape matches the live cohort).</p>
-      <p style="color:var(--yellow)"><strong>Caveat.</strong> Without a long-horizon anchor the fit is built on ≤30 days, so D360/D720 are pure extrapolation. Real long-tail retention usually flattens (power-law can under-count survivors) and ARPDAU drifts up — add a real D60/D90/D180 point, use the growth input, and treat far-horizon numbers as a band, not a point.</p>
+      <p style="color:var(--yellow)"><strong>Caveat.</strong> Without a long-horizon anchor the fit is built on ≤30 days, so D360/D720 are pure extrapolation. Real long-tail retention usually flattens (power-law can under-count survivors) and ARPDAU drifts up. Add a real D60/D90/D180 point, use the growth input, and treat far-horizon numbers as a band, not a point.</p>
     </div>
   </details>
 
@@ -206,14 +252,12 @@
 
   // ---- curve fits -------------------------------------------------------
   function fitPower(days, rets){
-    // R = A*d^b ; regress ln R on ln d
     var n=days.length, sx=0,sy=0,sxx=0,sxy=0;
     for(var i=0;i<n;i++){var x=Math.log(days[i]), y=Math.log(rets[i]); sx+=x;sy+=y;sxx+=x*x;sxy+=x*y;}
     var b=(n*sxy-sx*sy)/(n*sxx-sx*sx), lnA=(sy-b*sx)/n, A=Math.exp(lnA);
     return function(d){return clamp(A*Math.pow(d,b),0,1);};
   }
   function fitExp(days, rets){
-    // R = A*e^(b*d) ; regress ln R on d
     var n=days.length, sx=0,sy=0,sxx=0,sxy=0;
     for(var i=0;i<n;i++){var x=days[i], y=Math.log(rets[i]); sx+=x;sy+=y;sxx+=x*x;sxy+=x*y;}
     var b=(n*sxy-sx*sy)/(n*sxx-sx*sx), lnA=(sy-b*sx)/n, A=Math.exp(lnA);
@@ -239,40 +283,43 @@
 
   // ---- chart helper -----------------------------------------------------
   function drawChart(cv, opts){
-    var dpr=window.devicePixelRatio||1;
-    var W=cv.clientWidth, H=cv.height;
-    cv.width=W*dpr; cv.height=H*dpr;
-    var ctx=cv.getContext("2d"); ctx.scale(dpr,dpr);
-    ctx.clearRect(0,0,W,H);
-    var pad={l:48,r:14,t:10,b:24};
-    var pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
+    var dpr=window.devicePixelRatio||1, W=cv.clientWidth, H=cv.height;
+    if(W<=0) return;
+    cv.width=W*dpr; cv.height=H*dpr; var ctx=cv.getContext("2d"); ctx.scale(dpr,dpr); ctx.clearRect(0,0,W,H);
+    var pad={l:52,r:16,t:12,b:26}, pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
     var xmax=opts.xmax, ymax=opts.ymax;
-    var X=function(x){return pad.l + x/xmax*pw;};
-    var Y=function(y){return pad.t + ph - y/ymax*ph;};
-    ctx.strokeStyle="#2f344d"; ctx.fillStyle="#565f89"; ctx.font="10px ui-monospace,monospace"; ctx.lineWidth=1;
+    var X=function(x){return pad.l + x/xmax*pw;}, Y=function(y){return pad.t + ph - y/ymax*ph;};
+    ctx.font="10px 'Fira Code',ui-monospace,monospace"; ctx.lineWidth=1;
     for(var i=0;i<=4;i++){
       var yy=pad.t+ph*i/4, val=ymax*(1-i/4);
+      ctx.strokeStyle=i===4?"rgba(255,255,255,.11)":"rgba(255,255,255,.045)";
       ctx.beginPath();ctx.moveTo(pad.l,yy);ctx.lineTo(W-pad.r,yy);ctx.stroke();
-      ctx.textAlign="right";ctx.fillText(opts.yfmt?opts.yfmt(val):val.toFixed(0), pad.l-6, yy+3);
+      ctx.fillStyle="#5a6184";ctx.textAlign="right";ctx.fillText(opts.yfmt?opts.yfmt(val):val.toFixed(0), pad.l-8, yy+3);
     }
-    ctx.textAlign="center";
-    (opts.xticks||[]).forEach(function(t){ ctx.fillText(t.label, X(t.x), H-8); });
+    ctx.textAlign="center";ctx.fillStyle="#5a6184";
+    (opts.xticks||[]).forEach(function(t){ ctx.fillText(t.label, X(t.x), H-9); });
     if(opts.ref!=null && opts.ref<=ymax){
-      ctx.strokeStyle="#e0af68"; ctx.setLineDash([5,4]); ctx.beginPath();
+      ctx.strokeStyle="#e0af68"; ctx.setLineDash([5,4]);ctx.lineWidth=1.4; ctx.beginPath();
       ctx.moveTo(pad.l,Y(opts.ref));ctx.lineTo(W-pad.r,Y(opts.ref));ctx.stroke();ctx.setLineDash([]);
     }
     if(opts.marker!=null && opts.marker<=xmax){
-      ctx.strokeStyle="#9ece6a";ctx.setLineDash([3,3]);ctx.beginPath();
+      ctx.strokeStyle="#9ece6a";ctx.setLineDash([3,3]);ctx.lineWidth=1.4;ctx.beginPath();
       ctx.moveTo(X(opts.marker),pad.t);ctx.lineTo(X(opts.marker),pad.t+ph);ctx.stroke();ctx.setLineDash([]);
     }
+    ctx.lineJoin="round";ctx.lineCap="round";
     (opts.series||[]).forEach(function(s){
       if(s.type==="scatter"){
         ctx.fillStyle=s.color;
         s.pts.forEach(function(p){ if(p.x<=xmax){ctx.beginPath();ctx.arc(X(p.x),Y(p.y),3.8,0,7);ctx.fill();} });
       }else{
-        ctx.strokeStyle=s.color;ctx.lineWidth=2;ctx.beginPath();
-        s.pts.forEach(function(p,i){ var px=X(p.x),py=Y(p.y); i?ctx.lineTo(px,py):ctx.moveTo(px,py);});
-        ctx.stroke();
+        if(s.fill){
+          var g=ctx.createLinearGradient(0,pad.t,0,pad.t+ph);g.addColorStop(0,s.fill);g.addColorStop(1,"rgba(0,0,0,0)");
+          ctx.beginPath();ctx.moveTo(X(s.pts[0].x),Y(0));
+          s.pts.forEach(function(p){ctx.lineTo(X(p.x),Y(p.y));});
+          ctx.lineTo(X(s.pts[s.pts.length-1].x),Y(0));ctx.closePath();ctx.fillStyle=g;ctx.fill();
+        }
+        ctx.beginPath();s.pts.forEach(function(p,i){ var px=X(p.x),py=Y(p.y); i?ctx.lineTo(px,py):ctx.moveTo(px,py);});
+        ctx.strokeStyle=s.color;ctx.lineWidth=2.2;ctx.shadowColor=s.color;ctx.shadowBlur=10;ctx.stroke();ctx.shadowBlur=0;
       }
     });
   }
@@ -285,13 +332,11 @@
     var arpdau=+$("arpdau").value, ecpi=+$("ecpi").value, g=(+$("mat").value)/100;
     var model=$("model").value, H=+$("horizon").value;
 
-    // optional long-horizon anchor
     var fitDays=ANCHORS.slice(), fitRets=rets.slice();
     var aDay=parseFloat($("anchorDay").value), aRet=parseFloat($("anchorRet").value)/100;
     var anchored=false, anchorPt=null;
     if(aDay>30 && aRet>0 && aRet<1){ fitDays.push(aDay); fitRets.push(aRet); anchored=true; anchorPt={x:aDay,y:aRet*100}; }
 
-    // validation
     var warn=$("warn"), msgs=[];
     for(var i=0;i<rets.length;i++){ if(!(rets[i]>0&&rets[i]<=1)){msgs.push("Retention values must be between 0 and 100%.");break;} }
     for(var j=1;j<rets.length;j++){ if(rets[j]>rets[j-1]+1e-9){msgs.push("Retention should not increase over time (D"+ANCHORS[j]+" > D"+ANCHORS[j-1]+").");break;} }
@@ -302,7 +347,7 @@
         ? ("Projecting past your D"+aDay+" anchor still extrapolates the tail — treat D"+H+" as a band.")
         : ("Projecting to D"+H+" extrapolates a ≤30-day fit — add a long-horizon anchor to pin the tail."));
     }
-    if(msgs.length){warn.style.display="block";warn.innerHTML=msgs.map(function(m){return "⚠️ "+m;}).join("<br>");}
+    if(msgs.length){warn.style.display="flex";warn.innerHTML="<span>"+msgs.join("<br>")+"</span>";}
     else warn.style.display="none";
 
     var R=buildR(model, fitDays, fitRets);
@@ -310,7 +355,6 @@
     var S=ltvSeries(R, arpdau, g, maxN);
     var LTV=function(n){return S.ltv[Math.round(clamp(n,0,maxN))];};
 
-    // cards
     $("ltv30").textContent=fmtMoney(LTV(30));
     $("ltv180").textContent=fmtMoney(LTV(180));
     $("ltvHk").textContent="D"+H+" LTV";
@@ -319,10 +363,9 @@
     $("payback").textContent = ecpi>0 ? (pb!=null?("D"+pb):(">D720")) : "—";
     $("payback").className = "v "+(pb!=null && pb<=180?"green":(pb!=null?"yellow":"red"));
 
-    // retention chart
     var retPts=[]; for(var x=1;x<=H;x+=Math.max(1,Math.floor(H/120))) retPts.push({x:x,y:R(x)*100});
     var ser=[
-      {type:"line",color:"#7aa2f7",pts:retPts},
+      {type:"line",color:"#7aa2f7",fill:"rgba(122,162,247,.20)",pts:retPts},
       {type:"scatter",color:"#bb9af7",pts:ANCHORS.map(function(a,k){return {x:a,y:rets[k]*100};})}
     ];
     if(anchored) ser.push({type:"scatter",color:"#7dcfff",pts:[anchorPt]});
@@ -332,16 +375,14 @@
       series:ser
     });
 
-    // ltv chart
     var ltvPts=[]; for(var x2=0;x2<=H;x2+=Math.max(1,Math.floor(H/120))) ltvPts.push({x:x2,y:LTV(x2)});
     var ymaxL=Math.max(LTV(H), ecpi)*1.1;
     drawChart($("ltvChart"),{
       xmax:H, ymax:ymaxL, yfmt:function(v){return "$"+v.toFixed(2);}, ref: ecpi>0?ecpi:null, marker: pb,
       xticks:[{x:0,label:"D0"},{x:H*0.25,label:"D"+Math.round(H*0.25)},{x:H*0.5,label:"D"+Math.round(H*0.5)},{x:H*0.75,label:"D"+Math.round(H*0.75)},{x:H,label:"D"+H}],
-      series:[{type:"line",color:"#9ece6a",pts:ltvPts}]
+      series:[{type:"line",color:"#9ece6a",fill:"rgba(158,206,106,.18)",pts:ltvPts}]
     });
 
-    // table
     var rows=[7,14,30,60,90,180,360,720];
     $("tbody").innerHTML=rows.map(function(n){
       var roas= ecpi>0? (LTV(n)/ecpi*100):null;
@@ -349,7 +390,6 @@
       return "<tr><td>D"+n+"</td><td>"+S.active[n].toFixed(1)+"</td><td>"+fmtMoney(LTV(n))+"</td><td style='"+rc+"'>"+(roas==null?"—":roas.toFixed(0)+"%")+"</td></tr>";
     }).join("");
 
-    // reverse solver
     var T=+$("tgtRoas").value, Hd=+$("tgtDay").value;
     var reqE=function(E){return T*LTV(E)/LTV(Hd);};
     var reqArp = arpdau*(ecpi*T/100)/LTV(Hd);
@@ -358,10 +398,9 @@
       line("Required D7 ROAS to hit "+T+"% by D"+Hd, reqE(7).toFixed(1)+"%")+
       line("Required D14 ROAS to hit "+T+"% by D"+Hd, reqE(14).toFixed(1)+"%")+
       line("Required D30 ROAS to hit "+T+"% by D"+Hd, reqE(30).toFixed(1)+"%")+
-      line("Required ARPDAU (at current eCPI)", fmtMoney(reqArp)+(reqArp<=arpdau?" ✅":" ▲"))+
-      line("Max viable eCPI (at current ARPDAU)", fmtMoney(maxEcpi)+(ecpi<=maxEcpi?" ✅":" ▲"));
+      line("Required ARPDAU (at current eCPI)", fmtMoney(reqArp)+(reqArp<=arpdau?" ✓":" ▲"))+
+      line("Max viable eCPI (at current ARPDAU)", fmtMoney(maxEcpi)+(ecpi<=maxEcpi?" ✓":" ▲"));
 
-    // campaign projection
     var oR=+$("obsRoas").value, oD=clamp(+$("obsDay").value,1,maxN);
     var proj=function(Y){return oR*LTV(Y)/LTV(oD);};
     var beDay=null; for(var y=oD;y<=maxN;y++){ if(oR*LTV(y)/LTV(oD)>=100){beDay=y;break;} }
@@ -393,7 +432,6 @@
       compute();
     });
   });
-  // a manual edit means it's no longer a clean preset — drop the highlight
   ["d1","d3","d7","d14","d30","arpdau","ecpi","model","mat"].forEach(function(id){
     $(id).addEventListener("input",clearActive);
   });

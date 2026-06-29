@@ -12,6 +12,8 @@
 
 ![Mobile LTV & ROAS Modeler overview](assets/overview.png)
 
+> **Part of a two-tool UA suite.** This models LTV and ROAS. Its companion [**Lift Lab**](https://stonedhawk.github.io/mobile-ua-incrementality-lab/) measures incrementality and reconciles conflicting attribution numbers. Model the LTV, measure the lift, trust one number.
+
 ---
 
 ## 🎯 What it answers

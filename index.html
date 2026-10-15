@@ -110,7 +110,7 @@
   <div class="head">
     <div>
       <h1><span class="glyph"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#9ab4ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 7-7"/><path d="M17 7h4v4"/></svg></span> Mobile LTV &amp; ROAS Modeler</h1>
-      <p class="sub">Fit a retention curve from D1-D30, project LTV &amp; ROAS to D720, and reverse-solve the early ROAS you need to break even. Zero dependencies, nothing leaves your browser.</p>
+      <p class="sub">Fit a retention curve from D1-D30, project LTV &amp; ROAS to D720, and reverse-solve the early ROAS you need to break even. No JavaScript libraries, and nothing you enter leaves your browser.</p>
     </div>
     <a class="badge-link" href="https://stonedhawk.github.io/mobile-ua-incrementality-lab/" target="_blank"><span class="dot"></span> Part of the UA suite · Lift Lab</a>
   </div>
@@ -119,7 +119,7 @@
     <!-- LEFT: INPUTS -->
     <div>
       <div class="panel">
-        <h2 style="margin-top:0">Quick start <span style="color:var(--faint);text-transform:none;letter-spacing:0;font-weight:400">— load a profile</span></h2>
+        <h2 style="margin-top:0">Quick start <span style="color:var(--faint);text-transform:none;letter-spacing:0;font-weight:400">(load a profile)</span></h2>
         <div class="presets">
           <button type="button" class="preset" data-preset="hypercasual">Hypercasual</button>
           <button type="button" class="preset active" data-preset="casual">Casual</button>
@@ -146,7 +146,7 @@
         <h2 style="margin-top:20px">Model</h2>
         <label>Retention curve fit</label>
         <select id="model">
-          <option value="power" selected>Power-law (industry default)</option>
+          <option value="power" selected>Power-law</option>
           <option value="exp">Exponential</option>
           <option value="blend">Blended (power × exp average)</option>
         </select>
@@ -174,20 +174,20 @@
       <div id="warn" class="warn" style="display:none"></div>
 
       <div class="cards">
-        <div class="card blue"><div class="k">D30 LTV</div><div id="ltv30" class="v blue">—</div></div>
-        <div class="card"><div class="k">D180 LTV</div><div id="ltv180" class="v">—</div></div>
-        <div class="card"><div class="k" id="ltvHk">D360 LTV</div><div id="ltvH" class="v">—</div></div>
-        <div class="card yellow"><div class="k">Payback day</div><div id="payback" class="v yellow">—</div></div>
+        <div class="card blue"><div class="k">D30 LTV</div><div id="ltv30" class="v blue">-</div></div>
+        <div class="card"><div class="k">D180 LTV</div><div id="ltv180" class="v">-</div></div>
+        <div class="card"><div class="k" id="ltvHk">D360 LTV</div><div id="ltvH" class="v">-</div></div>
+        <div class="card yellow"><div class="k">Payback day</div><div id="payback" class="v yellow">-</div></div>
       </div>
 
       <div class="panel chartbox">
-        <h3>Retention curve — fitted (line) vs your inputs (dots)</h3>
+        <h3>Retention curve: fitted (line) vs your inputs (dots)</h3>
         <canvas id="retChart" height="240"></canvas>
-        <div class="legend"><b style="color:var(--blue)">━</b> fitted &nbsp; <b style="color:var(--purple)">●</b> D1–D30 anchors &nbsp; <b style="color:var(--cyan)">●</b> long-horizon anchor</div>
+        <div class="legend"><b style="color:var(--blue)">━</b> fitted &nbsp; <b style="color:var(--purple)">●</b> D1 to D30 anchors &nbsp; <b style="color:var(--cyan)">●</b> long-horizon anchor</div>
       </div>
 
       <div class="panel chartbox">
-        <h3>Cumulative LTV vs eCPI — break-even where the curve crosses the dashed line</h3>
+        <h3>Cumulative LTV vs eCPI: break-even where the curve crosses the dashed line</h3>
         <canvas id="ltvChart" height="240"></canvas>
       </div>
 
@@ -201,7 +201,7 @@
 
       <!-- REVERSE SOLVER -->
       <div class="panel chartbox">
-        <h2>Reverse solver — what do I need to break even?</h2>
+        <h2>Reverse solver: what do I need to break even?</h2>
         <div class="row2" style="margin-bottom:6px">
           <div><label>Reach this ROAS…</label><input id="tgtRoas" type="number" value="100" step="5"></div>
           <div><label>…by day</label>
@@ -226,9 +226,9 @@
   </div>
 
   <details>
-    <summary>Model &amp; assumptions — read before trusting a D720 number</summary>
+    <summary>Model &amp; assumptions: read before trusting a D720 number</summary>
     <div class="body">
-      <p><strong>Retention fit.</strong> Anchor points D1/D3/D7/D14/D30 (plus an optional long-horizon point) are fit by least-squares regression.
+      <p><strong>Retention fit.</strong> Anchor points D1/D3/D7/D14/D30 (plus an optional long-horizon point) are fit by ordinary least squares in log space.
       Power-law: <code>R(d) = A·d^b</code> (log-log regression). Exponential: <code>R(d) = A·e^(b·d)</code> (semi-log).
       Blended averages the two predicted curves. Day 0 (install day) retention = 1.0.</p>
       <p><strong>Active days.</strong> <code>ActiveDays(N) = 1 + Σ R(d)</code> for d = 1…N (sum of fitted daily retention, plus the install day).</p>
@@ -236,11 +236,11 @@
       <p><strong>ROAS.</strong> <code>ROAS(N) = LTV(N) / eCPI × 100%</code>. Payback day = first day LTV ≥ eCPI.</p>
       <p><strong>Reverse solver.</strong> Required ROAS at day E to hit target T% by day H: <code>T × LTV(E)/LTV(H)</code>. Required ARPDAU: <code>ARPDAU₀ × (eCPI·T/100) / LTV(H)</code>. Max viable eCPI: <code>LTV(H)·100/T</code>.</p>
       <p><strong>Campaign projection.</strong> Projected ROAS at day Y from an observed ROAS at day X: <code>ROAS_obs × LTV(Y)/LTV(X)</code> (assumes the modeled curve shape matches the live cohort).</p>
-      <p style="color:var(--yellow)"><strong>Caveat.</strong> Without a long-horizon anchor the fit is built on ≤30 days, so D360/D720 are pure extrapolation. Real long-tail retention usually flattens (power-law can under-count survivors) and ARPDAU drifts up. Add a real D60/D90/D180 point, use the growth input, and treat far-horizon numbers as a band, not a point.</p>
+      <p style="color:var(--yellow)"><strong>Caveat.</strong> Without a long-horizon anchor the fit is built on ≤30 days, so D360/D720 are pure extrapolation. Real long-tail retention can decay more slowly than the fit, and ARPDAU can drift up. Add a real D60/D90/D180 point, use the growth input, and treat far-horizon numbers as a band, not a point.</p>
     </div>
   </details>
 
-  <p class="foot">Single-file, no dependencies, no data leaves the browser. Built for game producers &amp; UA teams.</p>
+  <p class="foot">Single file, no JavaScript libraries, and nothing you enter leaves the browser. Built for game producers &amp; UA teams.</p>
 </div>
 
 <script>
@@ -340,12 +340,12 @@
     var warn=$("warn"), msgs=[];
     for(var i=0;i<rets.length;i++){ if(!(rets[i]>0&&rets[i]<=1)){msgs.push("Retention values must be between 0 and 100%.");break;} }
     for(var j=1;j<rets.length;j++){ if(rets[j]>rets[j-1]+1e-9){msgs.push("Retention should not increase over time (D"+ANCHORS[j]+" > D"+ANCHORS[j-1]+").");break;} }
-    if(anchored && aRet>rets[4]) msgs.push("Long-horizon anchor (D"+aDay+") is higher than your D30 — it should be lower.");
+    if(anchored && aRet>rets[4]) msgs.push("Long-horizon anchor (D"+aDay+") is higher than your D30; it should be lower.");
     var anchorMax = anchored ? aDay : 30;
     if(H>anchorMax){
       msgs.push(anchored
-        ? ("Projecting past your D"+aDay+" anchor still extrapolates the tail — treat D"+H+" as a band.")
-        : ("Projecting to D"+H+" extrapolates a ≤30-day fit — add a long-horizon anchor to pin the tail."));
+        ? ("Projecting past your D"+aDay+" anchor still extrapolates the tail; treat D"+H+" as a band.")
+        : ("Projecting to D"+H+" extrapolates a ≤30-day fit; add a long-horizon anchor to pin the tail."));
     }
     if(msgs.length){warn.style.display="flex";warn.innerHTML="<span>"+msgs.join("<br>")+"</span>";}
     else warn.style.display="none";
@@ -360,7 +360,7 @@
     $("ltvHk").textContent="D"+H+" LTV";
     $("ltvH").textContent=fmtMoney(LTV(H));
     var pb=null; for(var d=0;d<=maxN;d++){ if(S.ltv[d]>=ecpi){pb=d;break;} }
-    $("payback").textContent = ecpi>0 ? (pb!=null?("D"+pb):(">D720")) : "—";
+    $("payback").textContent = ecpi>0 ? (pb!=null?("D"+pb):(">D720")) : "n/a";
     $("payback").className = "v "+(pb!=null && pb<=180?"green":(pb!=null?"yellow":"red"));
 
     var retPts=[]; for(var x=1;x<=H;x+=Math.max(1,Math.floor(H/120))) retPts.push({x:x,y:R(x)*100});
@@ -387,7 +387,7 @@
     $("tbody").innerHTML=rows.map(function(n){
       var roas= ecpi>0? (LTV(n)/ecpi*100):null;
       var rc = roas==null?"":(roas>=100?"color:#9ece6a":"color:#f7768e");
-      return "<tr><td>D"+n+"</td><td>"+S.active[n].toFixed(1)+"</td><td>"+fmtMoney(LTV(n))+"</td><td style='"+rc+"'>"+(roas==null?"—":roas.toFixed(0)+"%")+"</td></tr>";
+      return "<tr><td>D"+n+"</td><td>"+S.active[n].toFixed(1)+"</td><td>"+fmtMoney(LTV(n))+"</td><td style='"+rc+"'>"+(roas==null?"n/a":roas.toFixed(0)+"%")+"</td></tr>";
     }).join("");
 
     var T=+$("tgtRoas").value, Hd=+$("tgtDay").value;

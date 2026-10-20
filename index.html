@@ -283,9 +283,13 @@
 
   // ---- chart helper -----------------------------------------------------
   function drawChart(cv, opts){
-    var dpr=window.devicePixelRatio||1, W=cv.clientWidth, H=cv.height;
+    // After the first draw cv.height is the backing store in device pixels, not the CSS height,
+    // so keep the height attribute's value and pin it in CSS. Otherwise every redraw at
+    // devicePixelRatio>1 multiplies the chart height by dpr.
+    if(!cv.dataset.cssH){ cv.dataset.cssH=cv.height; cv.style.height=cv.height+"px"; }
+    var dpr=window.devicePixelRatio||1, W=cv.clientWidth, H=+cv.dataset.cssH;
     if(W<=0) return;
-    cv.width=W*dpr; cv.height=H*dpr; var ctx=cv.getContext("2d"); ctx.scale(dpr,dpr); ctx.clearRect(0,0,W,H);
+    cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); var ctx=cv.getContext("2d"); ctx.scale(dpr,dpr); ctx.clearRect(0,0,W,H);
     var pad={l:52,r:16,t:12,b:26}, pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
     var xmax=opts.xmax, ymax=opts.ymax;
     var X=function(x){return pad.l + x/xmax*pw;}, Y=function(y){return pad.t + ph - y/ymax*ph;};
